@@ -1,7 +1,7 @@
 {
-  "namespace": "com.udacity",
-  "name": "turnstile.value",
   "type": "record",
+  "name": "turnstile.value",
+  "namespace": "com.udacity.turnstile",
   "fields": [
     {
       "name": "station_id",

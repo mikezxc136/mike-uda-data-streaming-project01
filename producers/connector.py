@@ -4,11 +4,12 @@ import logging
 
 import requests
 
+
 logger = logging.getLogger(__name__)
+
 
 KAFKA_CONNECT_URL = "http://localhost:8083/connectors"
 CONNECTOR_NAME = "stations"
-
 
 def configure_connector():
     """Starts and configures the Kafka Connect connector"""
@@ -19,43 +20,46 @@ def configure_connector():
         logging.debug("connector already created skipping recreation")
         return
 
-    # Using the JDBC Source Connector to connect to Postgres. Load the `stations` table
+    # TODO: Complete the Kafka Connect Config below.
+    # Directions: Use the JDBC Source Connector to connect to Postgres. Load the `stations` table
     # using incrementing mode, with `stop_id` as the incrementing column name.
-
+    # Make sure to think about what an appropriate topic prefix would be, and how frequently Kafka
+    # Connect should run this connector (hint: not very often!)
+    logger.info("connector code not completed skipping connector creation")
     resp = requests.post(
-        KAFKA_CONNECT_URL,
-        headers={"Content-Type": "application/json"},
-        data=json.dumps({
-            "name": CONNECTOR_NAME,
-            "config": {
-                "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
-                "key.converter": "org.apache.kafka.connect.json.JsonConverter",
-                "key.converter.schemas.enable": "false",
-                "value.converter": "org.apache.kafka.connect.json.JsonConverter",
-                "value.converter.schemas.enable": "false",
-                "batch.max.rows": "500",
-                "connection.url": "jdbc:postgresql://postgres:5432/cta",
-                "connection.user": "cta_admin",
-                "connection.password": "chicago",
-                "table.whitelist": "stations",
-                "mode": "incrementing",
-                "incrementing.column.name": "stop_id",
-                # Using appropriate topic prefix
-                "topic.prefix": "jdbc.",
-                "poll.interval.ms": 1000,
-            }
-        }),
+       KAFKA_CONNECT_URL,
+       headers={"Content-Type": "application/json"},
+       data=json.dumps({
+           "name": CONNECTOR_NAME,
+           "config": {
+               "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+               "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+               "key.converter.schemas.enable": "false",
+               "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+               "value.converter.schemas.enable": "false",
+               "batch.max.rows": "500",
+               # TODO
+               "connection.url": "jdbc:postgresql://localhost:5432/cta",
+               # TODO
+               "connection.user": "cta_admin",
+               # TODO
+               "connection.password": "chicago",
+               # TODO
+               "table.whitelist": "stations",
+               # TODO
+               "mode": "incrementing",
+               # TODO
+               "incrementing.column.name": "stop_id",
+               "topic.prefix": "org.chicago.cta.",
+               # TODO
+               "poll.interval.ms": "900000",
+           }
+       }),
     )
-    # print(resp.content)
 
-    try:
-        resp.raise_for_status()
-    except:
-        logging.info(f"failed creating connector: {json.dumps(resp.json(), indent=2)}")
-        exit(1)
-
-    logging.info("connector created successfully")
-    return
+    ## Ensure a healthy response was given
+    resp.raise_for_status()
+    logging.debug("connector created successfully")
 
 
 if __name__ == "__main__":
